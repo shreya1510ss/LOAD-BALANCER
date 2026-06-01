@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  server1:
+    build: ./server1
+    container_name: server1
+    networks:
+      - lb-network
+
+  server2:
+    build: ./server2
+    container_name: server2
+    networks:
+      - lb-network
+
+  server3:
+    build: ./server3
+    container_name: server3
+    networks:
+      - lb-network
+
+  loadbalancer:
+    build: .
+    container_name: loadbalancer
+    ports:
+      - "8080:8080"
+    environment:
+      - SERVER1_ADDR=server1:8081
+      - SERVER2_ADDR=server2:8082
+      - SERVER3_ADDR=server3:8083
+    depends_on:
+      - server1
+      - server2
+      - server3
+    networks:
+      - lb-network
+
+networks:
+  lb-network:
+    driver: bridge

@@ -8,10 +8,18 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"os"
 	"sync"
 	"sync/atomic"
 	"time"
 )
+
+func getEnv(key, fallback string) string {
+	if val := os.Getenv(key); val != "" {
+		return val
+	}
+	return fallback
+}
 
 type Server struct{
 	address string
@@ -157,9 +165,9 @@ func main() {
 	algorithm := RoundRobin
 	interval := 10 * time.Second
 	
-	pool.AddServer("localhost:8081", 1)
-	pool.AddServer("localhost:8082", 1)
-	pool.AddServer("localhost:8083", 1)
+	pool.AddServer(getEnv("SERVER1_ADDR", "localhost:8081"), 1)
+	pool.AddServer(getEnv("SERVER2_ADDR", "localhost:8082"), 1)
+	pool.AddServer(getEnv("SERVER3_ADDR", "localhost:8083"), 1)
 
 	lb := &LoadBalancer{
 		pool:      pool,
